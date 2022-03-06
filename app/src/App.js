@@ -12,7 +12,7 @@ const TWITTER_HANDLE = '_buildspace'
 const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`
 // Add the domain you will be minting
 const tld = '.geek'
-const CONTRACT_ADDRESS = '0x19f99c0905b2b8bd2193760e8628f7caaca311e6'
+const CONTRACT_ADDRESS = '0xbed09974247Fd6874602ad924BBE33cfa9Ab92DB'
 
 const App = () => {
   const [currentAccount, setCurrentAccount] = useState('')
@@ -27,10 +27,10 @@ const App = () => {
   const switchNetwork = async () => {
     if (window.ethereum) {
       try {
-        // Try to switch to the Mumbai testnet
+        // Try to switch to the Ropsten testnet
         await window.ethereum.request({
           method: 'wallet_switchEthereumChain',
-          params: [{ chainId: '0x13881' }], // Check networks.js for hexadecimal network ids
+          params: [{ chainId: '0x3' }], // Check networks.js for hexadecimal network ids
         })
       } catch (error) {
         // This error code means that the chain we want has not been added to MetaMask
@@ -41,15 +41,17 @@ const App = () => {
               method: 'wallet_addEthereumChain',
               params: [
                 {
-                  chainId: '0x13881',
-                  chainName: 'Polygon Mumbai Testnet',
-                  rpcUrls: ['https://rpc-mumbai.maticvigil.com/'],
+                  chainId: '0x3',
+                  chainName: 'Ropsten',
+                  rpcUrls: [
+                    'https://ropsten.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161',
+                  ],
                   nativeCurrency: {
-                    name: 'Mumbai Matic',
-                    symbol: 'MATIC',
+                    name: 'Ropsten Ether',
+                    symbol: 'ETH',
                     decimals: 18,
                   },
-                  blockExplorerUrls: ['https://mumbai.polygonscan.com/'],
+                  blockExplorerUrls: ['https://ropsten.etherscan.io/'],
                 },
               ],
             })
@@ -110,7 +112,7 @@ const App = () => {
     if (chainId && networks[chainId]) {
       setNetwork(networks[chainId])
     } else {
-      setNetwork(networks['0x13881'])
+      setNetwork(networks['0x3'])
     }
 
     ethereum.on('chainChanged', handleChainChanged)
@@ -140,10 +142,10 @@ const App = () => {
 
   // Form to enter domain name and data
   const renderInputForm = () => {
-    if (network !== 'Polygon Mumbai Testnet') {
+    if (network !== 'Ropsten') {
       return (
         <div className="connect-wallet-container">
-          <p>Please connect to Polygon Mumbai Testnet</p>
+          <p>Please connect to Ropsten Testnet</p>
         </div>
       )
     }
@@ -212,7 +214,7 @@ const App = () => {
                   <div className="mint-row">
                     <a
                       className="link"
-                      href={`https://testnets.opensea.io/assets/mumbai/${CONTRACT_ADDRESS}/${mint.id}`}
+                      href={`https://testnets.opensea.io/assets/${CONTRACT_ADDRESS}/${mint.id}`}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
@@ -290,16 +292,14 @@ const App = () => {
         // Check if the transaction was successfully completed
         if (receipt.status === 1) {
           console.log(
-            'Domain minted! https://mumbai.polygonscan.com/tx/' + tx.hash
+            'Domain minted! https://ropsten.etherscan.io/tx/' + tx.hash
           )
 
           // Set the record for the domain
           tx = await contract.setRecord(domain, record)
           await tx.wait()
 
-          console.log(
-            'Record set! https://mumbai.polygonscan.com/tx/' + tx.hash
-          )
+          console.log('Record set! https://ropsten.etherscan.io/tx/' + tx.hash)
 
           // Call fetchMints after 2 seconds
           setTimeout(() => {
@@ -357,7 +357,7 @@ const App = () => {
 
   // This will run any time currentAccount or network are changed
   useEffect(() => {
-    if (network === 'Polygon Mumbai Testnet') {
+    if (network === 'Ropsten') {
       fetchMints()
     }
   }, [currentAccount, network])
@@ -381,7 +381,7 @@ const App = () => {
 
         let tx = await contract.setRecord(domain, record)
         await tx.wait()
-        console.log('Record set https://mumbai.polygonscan.com/tx/' + tx.hash)
+        console.log('Record set https://ropsten.etherscan.io/tx/' + tx.hash)
 
         fetchMints()
         setRecord('')
